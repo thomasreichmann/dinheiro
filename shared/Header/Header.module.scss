@@ -1,0 +1,21 @@
+.wrapper {
+	color: white;
+
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+	max-width: 1240px;
+	margin: 0px auto;
+	padding: 24px 40px;
+	width: 100%;
+}
+
+.buttonsWrapper {
+	display: flex;
+}
+
+.mainButtons {
+	display: flex;
+	margin-inline-end: 16px;
+}

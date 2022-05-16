@@ -25,7 +25,7 @@ export default function Header() {
 								signOut();
 							}}
 						>
-							SignOut
+							Logout
 						</button>
 					) : (
 						<button

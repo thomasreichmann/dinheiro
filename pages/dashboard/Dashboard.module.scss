@@ -1,0 +1,29 @@
+.main {
+	display: flex;
+	flex-direction: column;
+
+	justify-content: center;
+	height: 100vh;
+	align-items: center;
+}
+
+.form {
+	display: grid;
+	justify-items: center;
+	row-gap: 12px;
+
+	button {
+		font-size: 24px;
+	}
+
+	input::-webkit-outer-spin-button,
+	input::-webkit-inner-spin-button {
+		/* display: none; <- Crashes Chrome on hover */
+		-webkit-appearance: none;
+		margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+	}
+
+	input[type='number'] {
+		-moz-appearance: textfield; /* Firefox */
+	}
+}

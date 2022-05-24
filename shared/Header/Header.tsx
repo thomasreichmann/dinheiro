@@ -11,14 +11,10 @@ export default function Header() {
 	return (
 		<header>
 			<div className={styles.wrapper}>
-				<span>LOGO</span>
+				<span></span>
 				<div className={styles.buttonsWrapper}>
 					<div className={styles.mainButtons}>
-						<>
-							<a href='https://discord.gg/Hu69Ds2vse' target='_blank' rel='noreferrer'>
-								Support Server
-							</a>
-						</>
+						<></>
 					</div>
 					{session ? (
 						// <img src={session.user?.image!} />

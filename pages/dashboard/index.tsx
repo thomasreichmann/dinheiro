@@ -1,5 +1,5 @@
 import { NextPage } from 'next';
-import { getSession } from 'next-auth/react';
+import { getSession, useSession } from 'next-auth/react';
 import { useState } from 'react';
 import connectToDatabase from '../../lib/connectToDatabase';
 import styles from './Dashboard.module.scss';
@@ -9,6 +9,8 @@ interface Props {
 }
 
 const Dashboard: NextPage<Props> = (props) => {
+	const { data: session } = useSession();
+
 	let [gasto, setGasto] = useState<string>('');
 	let [total, setTotal] = useState(props.balance ?? 0);
 
@@ -43,13 +45,17 @@ const Dashboard: NextPage<Props> = (props) => {
 
 	return (
 		<>
-			<div className={styles.main}>
-				<h1>{total}</h1>
-				<form className={styles.form} onSubmit={handleConfirm}>
-					<input autoFocus name='value' value={gasto ?? ''} onChange={updateGasto} />
-					<button onClick={handleConfirm}>confirm</button>
-				</form>
-			</div>
+			{session ? (
+				<div className={styles.main}>
+					<h1>{total}</h1>
+					<form className={styles.form} onSubmit={handleConfirm}>
+						<input autoFocus name='value' value={gasto ?? ''} onChange={updateGasto} />
+						<button onClick={handleConfirm}>confirm</button>
+					</form>
+				</div>
+			) : (
+				<h1>unauthenticated</h1>
+			)}
 		</>
 	);
 };

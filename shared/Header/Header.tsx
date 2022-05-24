@@ -1,7 +1,9 @@
 import { signIn, signOut, useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
 import styles from './Header.module.scss';
 
 export default function Header() {
+	const router = useRouter();
 	const { data: session } = useSession();
 
 	console.log(session?.user?.image!);

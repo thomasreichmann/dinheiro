@@ -4,6 +4,10 @@
 
 	justify-content: center;
 	align-items: center;
+
+	h1 {
+		font-size: 4em;
+	}
 }
 
 .form {
@@ -12,7 +16,12 @@
 	row-gap: 12px;
 
 	button {
-		font-size: 24px;
+		font-size: 2em;
+	}
+
+	input {
+		width: 193px;
+		font-size: 2em;
 	}
 
 	input::-webkit-outer-spin-button,

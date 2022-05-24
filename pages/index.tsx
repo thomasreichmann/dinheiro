@@ -57,7 +57,7 @@ const Home: NextPage = (props: Props) => {
 					</form>
 				</div>
 			) : (
-				<h1>unauthenticated</h1>
+				<></>
 			)}
 		</>
 	);

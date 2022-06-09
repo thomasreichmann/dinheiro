@@ -1,14 +1,12 @@
 import type { NextPage } from 'next';
 import { getSession, useSession } from 'next-auth/react';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import connectToDatabase from '../lib/connectToDatabase';
-import Header from '../shared/Header/Header';
 import styles from '../styles/Home.module.scss';
 
 interface Props {
 	balance?: number;
+	allowance?: number;
 }
 
 const Home: NextPage = (props: Props) => {
@@ -16,8 +14,6 @@ const Home: NextPage = (props: Props) => {
 
 	let [gasto, setGasto] = useState<string>('');
 	let [total, setTotal] = useState(props.balance ?? 0);
-
-	// console.log(props);
 
 	const updateGasto = (e: any) => {
 		let value = e.target.value;
@@ -68,7 +64,8 @@ interface User {
 	email: string;
 	image: string;
 	emailVerified: boolean;
-	balance: number;
+	balance?: number;
+	allowance?: number;
 }
 
 export async function getServerSideProps(context: any) {
@@ -87,13 +84,11 @@ export async function getServerSideProps(context: any) {
 	console.log(user);
 	if (!user) return { props: {} };
 
-	if (!user.balance) {
-		// set default user balance and send response
-		users.updateOne({ email: user.email }, { $set: { balance: 0 } });
-		return { props: { balance: 0 } };
-	} else {
-		return { props: { balance: user.balance } };
-	}
+	if (!user.balance) users.updateOne({ email: user.email }, { $set: { balance: 0 } });
+
+	if (!user.allowance) users.updateOne({ email: user.email }, { $set: { allowance: 0 } });
+
+	return { props: { balance: user.balance, allowance: user.allowance } };
 }
 
 export default Home;

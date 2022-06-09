@@ -1,7 +1,7 @@
 name: increment-balance-cron
 on:
     schedule:
-        - cron: '0 */24 * * *'
+        - cron: '0 21 * * *'
 jobs:
     cron:
         runs-on: ubuntu-latest

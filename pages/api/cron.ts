@@ -2,6 +2,7 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import connectToDatabase from '../../lib/connectToDatabase';
+import Transaction from '../../models/Transaction';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 	if (req.method === 'POST') {
@@ -15,6 +16,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 			user.balance += user.allowance;
 			collection.updateOne({ email: user.email }, { $set: { balance: user.balance } });
+
+			// Save transaction log
+			let transactions = db.collection<Transaction>('transactions');
+			transactions.insertOne({
+				userId: user._id,
+				type: TransactionType.IN,
+				ammount: user.allowance,
+				before: user.balance - user.allowance,
+				after: user.balance,
+				date: new Date().toISOString(),
+			});
 		}
 
 		res.status(200).end();
@@ -22,4 +34,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 		res.setHeader('Allow', 'POST');
 		res.status(405).end('Method Not Allowed');
 	}
+}
+
+export enum TransactionType {
+	OUT = 'OUT',
+	IN = 'IN',
+	RESET = 'RESET',
 }

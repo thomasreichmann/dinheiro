@@ -1,13 +1,15 @@
+import { ObjectId } from 'mongodb';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getSession } from 'next-auth/react';
 import connectToDatabase from '../../../../lib/connectToDatabase';
+import Transaction, { TransactionType } from '../../../../models/Transaction';
 
 type Data = {
 	balance: number;
 };
 
 interface User {
-	_id: string;
+	_id: ObjectId;
 	name: string;
 	email: string;
 	image: string;
@@ -33,6 +35,17 @@ export default async function (req: NextApiRequest, res: NextApiResponse<Data | 
 	if (!user) return res.status(500).json({ error: 'User not found error' });
 
 	users.updateOne({ email: user.email }, { $set: { balance: req.body.balance } });
+
+	// Create a transaction log
+	let transactions = db.collection<Transaction>('transactions');
+	transactions.insertOne({
+		userId: user._id,
+		type: TransactionType.OUT,
+		ammount: user.balance - req.body.balance,
+		before: user.balance,
+		after: req.body.balance,
+		date: new Date().toISOString(),
+	});
 
 	return res.status(200).send({ balance: req.body.balance });
 }

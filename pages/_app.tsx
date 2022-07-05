@@ -1,9 +1,7 @@
-import '../styles/globals.css';
-import type { AppProps } from 'next/app';
 import { SessionProvider } from 'next-auth/react';
-import styles from '../styles/Home.module.css';
-import Header from '../shared/Header/Header';
+import type { AppProps } from 'next/app';
 import Layout from '../components/Layout';
+import '../styles/globals.css';
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 	return (

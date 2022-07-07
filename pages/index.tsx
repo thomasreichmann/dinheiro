@@ -42,14 +42,23 @@ const Home: NextPage = (props: Props) => {
 		setGasto('');
 	};
 
+	const handleInvert = async (e: any) => {
+		e.preventDefault();
+		if (gasto.charAt(0) != '-') setGasto('-' + gasto);
+		else setGasto(gasto.substring(1));
+	};
+
 	return (
 		<>
 			{session ? (
 				<div className={styles.main}>
 					<h1>{total}</h1>
 					<form className={styles.form} onSubmit={handleConfirm}>
+						<button type='submit' className={styles.confirmButton} onClick={handleConfirm}>
+							confirm
+						</button>
+						<button onClick={handleInvert}>-</button>
 						<input autoFocus inputMode='numeric' name='value' value={gasto ?? ''} onChange={updateGasto} />
-						<button onClick={handleConfirm}>confirm</button>
 					</form>
 				</div>
 			) : (

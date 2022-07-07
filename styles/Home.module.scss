@@ -10,8 +10,17 @@
 	}
 }
 
+.confirmButton {
+	grid-column: 2;
+	grid-row: 2;
+	width: 100%;
+}
+
 .form {
 	display: grid;
+	grid-template-columns: auto auto;
+	grid-template-rows: auto auto;
+
 	justify-items: center;
 	row-gap: 12px;
 

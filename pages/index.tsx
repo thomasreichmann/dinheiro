@@ -57,7 +57,7 @@ const Home: NextPage = (props: Props) => {
 						<button type='submit' className={styles.confirmButton} onClick={handleConfirm}>
 							confirm
 						</button>
-						<button onClick={handleInvert} onTouchEnd={(e) => e.preventDefault()}>
+						<button onClick={handleInvert} onTouchEnd={handleInvert}>
 							-
 						</button>
 						<input autoFocus inputMode='numeric' name='value' value={gasto ?? ''} onChange={updateGasto} />

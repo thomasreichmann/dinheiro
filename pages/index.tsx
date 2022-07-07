@@ -48,7 +48,7 @@ const Home: NextPage = (props: Props) => {
 				<div className={styles.main}>
 					<h1>{total}</h1>
 					<form className={styles.form} onSubmit={handleConfirm}>
-						<input autoFocus name='value' value={gasto ?? ''} onChange={updateGasto} />
+						<input autoFocus inputMode='numeric' name='value' value={gasto ?? ''} onChange={updateGasto} />
 						<button onClick={handleConfirm}>confirm</button>
 					</form>
 				</div>

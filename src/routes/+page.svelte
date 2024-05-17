@@ -1,6 +1,4 @@
 <script lang="ts">
-    import { writable } from 'svelte/store';
-    import { onMount } from 'svelte';
     import { ProgressRadial } from '@skeletonlabs/skeleton';
     import { getBalance, updateBalance } from '$lib/client/balanceClient';
 

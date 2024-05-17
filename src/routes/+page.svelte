@@ -1,62 +1,52 @@
-<form on:submit={() => onUpdate(value ?? 0)} class="flex flex-col items-center justify-center h-screen gap-4">
-	{#if $balance === undefined}
-		<h1 class="text-2xl font-bold">Loading...</h1>
-	{:else}
-		<h1 class="text-2xl font-bold">{$balance}</h1>
-	{/if}
-	<div class="flex flex-col items-center h-20 w-20">
-		<input type="number" id="value-input" bind:value={value}
-					 class="leading-20 px-2 text-2xl text-center rounded-none w-full appearance-none h-full input">
-	</div>
-	<button type="submit" class="btn variant-filled-primary">add</button>
-</form>
-
 <script lang="ts">
-	import { writable } from 'svelte/store';
-	import type { GetBalanceResponse, UpdateBalanceRequest } from '$lib/types';
-	import { onMount } from 'svelte';
+    import { writable } from 'svelte/store';
+    import { onMount } from 'svelte';
+    import { ProgressRadial } from '@skeletonlabs/skeleton';
+    import { getBalance, updateBalance } from '$lib/client/balanceClient';
 
-	let balance = writable<number>();
-	let value: number | undefined;
+    const userId = '123';
 
-	onMount(async () => {
-		balance.subscribe((val) => sendUpdateBalanceRequest({ balance: val, userId: '123' }));
-		// TODO: figure out if we can do the fetching here, because we can cause an infinite loop if we update the balance and then are subscribed to the balance store
-	});
+    let value: number | undefined;
 
-	function onUpdate(val: number) {
-		balance.update((prev) => prev + val);
-		value = undefined; // Clear value
-	}
+    const updateMutation = updateBalance();
+    const getQuery = getBalance(userId);
 
-	async function getBalance(userId: string) {
-		const res = await fetch(`/api/balance/${userId}`).then((res) => res.json()) as GetBalanceResponse;
-		return res.balance;
-	}
-
-	async function sendUpdateBalanceRequest(updateRequest: UpdateBalanceRequest) {
-		const res = await fetch('/api/balance', {
-			method: 'PUT',
-			body: JSON.stringify(updateRequest),
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		}).then((res) => res.json()) as UpdateBalanceRequest;
-
-		console.log(res);
-	}
+    async function onUpdate(val: number) {
+        value = undefined;
+        $updateMutation.mutate({ userId, balance: val + ($getQuery.data?.balance ?? 0) });
+    }
 </script>
+
+<form
+    on:submit={() => onUpdate(value ?? 0)}
+    class="flex h-screen flex-col items-center justify-center gap-4"
+>
+    {#if $getQuery.isPending}
+        <ProgressRadial value={undefined} />
+    {:else}
+        <h1 class="text-2xl font-bold">{$getQuery.data?.balance}</h1>
+    {/if}
+    <div class="flex h-20 w-20 flex-col items-center">
+        <input
+            type="number"
+            id="value-input"
+            bind:value
+            class="leading-20 input h-full w-full appearance-none rounded-none px-2 text-center text-2xl"
+        />
+    </div>
+    <button type="submit" class="variant-filled-primary btn">add</button>
+</form>
 
 <style>
     /* For Chrome, Safari, Edge, Opera */
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button {
+    input[type='number']::-webkit-inner-spin-button,
+    input[type='number']::-webkit-outer-spin-button {
         -webkit-appearance: none;
         margin: 0;
     }
 
     /* For Firefox */
-    input[type="number"] {
+    input[type='number'] {
         -moz-appearance: textfield;
     }
 </style>

@@ -8,9 +8,9 @@ Mantém um número de "dinheiro sobrando" cada dia, incrementado por um valor di
 
 O uso proposto é, se por exemplo:
 
-- Quero gastar só mais R$2000 esse mês
-- Hoje é dia 10
-- Então, o valor diário é R$2000 / 20 = R$100
+-   Quero gastar só mais R$2000 esse mês
+-   Hoje é dia 10
+-   Então, o valor diário é R$2000 / 20 = R$100
 
 Logo, teremos um valor de R$100 adicionado ao "dinheiro sobrando" a cada dia.
-Mostrando qual o valor diário que pode ser "gasto" 
+Mostrando qual o valor diário que pode ser "gasto"

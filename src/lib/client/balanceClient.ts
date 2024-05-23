@@ -1,5 +1,4 @@
 import type { GetBalanceResponse, UpdateBalanceRequest } from '$lib/types';
-import { debugTimeout } from '$lib/utils';
 import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
 
 const BASE_PATH = '/api/balance';
@@ -16,10 +15,12 @@ const BASE_PATH = '/api/balance';
  *   <p>Balance: {balance.data.amount}</p>
  * {/if}
  */
-export function getBalance(userId: string) {
+export function getBalance(sessionId: string, initialData?: GetBalanceResponse) {
     return createQuery<GetBalanceResponse>({
         queryKey: ['balance'],
-        queryFn: async () => await fetch(`${BASE_PATH}/${userId}`).then((r) => r.json())
+        queryFn: async () => await fetch(`${BASE_PATH}/${sessionId}`).then((r) => r.json()),
+        initialData: initialData as undefined,
+        staleTime: 3000
     });
 }
 

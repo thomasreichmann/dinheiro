@@ -1,17 +1,29 @@
 <script lang="ts">
     import { ProgressRadial } from '@skeletonlabs/skeleton';
     import { getBalance, updateBalance } from '$lib/client/balanceClient';
+    import type { PageData } from './$types';
 
-    const userId = '123';
+    export let data: PageData;
+
+    const { user } = data;
+
+    const sessionId = '123';
 
     let value: number | undefined;
 
     const updateMutation = updateBalance();
-    const getQuery = getBalance(userId);
+
+    const getQuery = getBalance(
+        sessionId,
+        user ? { userId: user.sessionId, balance: user.balance } : undefined
+    );
 
     async function onUpdate(val: number) {
         value = undefined;
-        $updateMutation.mutate({ userId, balance: val + ($getQuery.data?.balance ?? 0) });
+        $updateMutation.mutate({
+            userId: sessionId,
+            balance: val + ($getQuery.data?.balance ?? 0)
+        });
     }
 </script>
 
@@ -32,6 +44,7 @@
             class="leading-20 input h-full w-full appearance-none rounded-none px-2 text-center text-2xl"
         />
     </div>
+
     <button type="submit" class="variant-filled-primary btn">add</button>
 </form>
 

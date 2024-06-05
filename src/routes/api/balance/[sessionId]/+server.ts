@@ -1,6 +1,7 @@
 import { error, type RequestHandler } from '@sveltejs/kit';
 import { PrismaClient } from '@prisma/client';
 import type { GetBalanceResponse } from '$lib/types';
+import { debugTimeout } from '$lib/utils';
 
 const prisma = new PrismaClient();
 
@@ -14,9 +15,6 @@ export const GET: RequestHandler = async ({ params }): Promise<Response> => {
     });
 
     if (!user) return error(404, { message: 'NOT FOUND' });
-
-    // console.log(user, specificUser);
-    console.log('server call');
 
     const response: GetBalanceResponse = {
         userId: user.sessionId,

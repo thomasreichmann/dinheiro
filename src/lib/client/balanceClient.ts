@@ -1,5 +1,6 @@
 import type { GetBalanceResponse, UpdateBalanceRequest } from '$lib/types';
-import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
+import { createQuery } from '@tanstack/svelte-query';
+import { createMutationWithOptimisticUpdate } from '$lib/client/baseClient';
 
 const BASE_PATH = '/api/balance';
 
@@ -25,21 +26,16 @@ export function getBalance(sessionId: string, initialData?: GetBalanceResponse) 
 }
 
 /**
- * Update the balance for a user.
- *
- * TODO: implement this using svelte-query
+ * Specific function to update the balance for a user.
  *
  * @example
- * const updatedBalance = await updateBalance({
- *    userId: '123',
- *    amount: 100
- * });
+ * const updateMutation = updateBalance();
+ *
+ * await updateMutation.mutate({ sessionId, balance: 100 });
  */
 export function updateBalance() {
-    const client = useQueryClient();
-
-    const updateBalanceFn = async (rq: UpdateBalanceRequest) => {
-        return await fetch(`${BASE_PATH}`, {
+    const mutationFn = async (rq: UpdateBalanceRequest) => {
+        return await fetch('/api/balance', {
             method: 'PUT',
             body: JSON.stringify(rq),
             headers: {
@@ -48,34 +44,8 @@ export function updateBalance() {
         }).then((r) => r.json());
     };
 
-    return createMutation({
-        mutationFn: updateBalanceFn,
-        onMutate: async (rq: UpdateBalanceRequest) => {
-            // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-            await client.cancelQueries({ queryKey: ['balance'] });
-
-            // Snapshot the previous value
-            const previousBalance = client.getQueryData<GetBalanceResponse>(['balance']);
-
-            // Optimistically update to the new value
-            if (previousBalance) {
-                client.setQueryData<GetBalanceResponse>(['balance'], {
-                    ...previousBalance,
-                    balance: rq.balance
-                });
-            }
-
-            return { previousBalance };
-        },
-        // If the mutation fails, use the context returned from onMutate to roll back
-        onError: (err: any, variables: any, context: any) => {
-            if (context?.previousBalance) {
-                client.setQueryData<GetBalanceResponse>(['balance'], context.previousBalance);
-            }
-        },
-        // Always refetch after error or success:
-        onSettled: () => {
-            client.invalidateQueries({ queryKey: ['balance'] });
-        }
-    });
+    return createMutationWithOptimisticUpdate<GetBalanceResponse, UpdateBalanceRequest>(
+        ['balance'],
+        mutationFn
+    );
 }

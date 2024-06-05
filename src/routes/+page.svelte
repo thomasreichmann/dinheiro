@@ -3,7 +3,6 @@
     import { getBalance, updateBalance } from '$lib/client/balanceClient';
     import type { PageData } from './$types';
     import ConfigModal from '$lib/components/ConfigModal.svelte';
-    import { useIsFetching } from '@tanstack/svelte-query';
 
     export let data: PageData;
     const { user } = data;

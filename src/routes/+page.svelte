@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { ProgressRadial } from '@skeletonlabs/skeleton';
+    import { getModalStore, type ModalSettings, ProgressRadial } from '@skeletonlabs/skeleton';
     import { getBalance, updateBalance } from '$lib/client/balanceClient';
     import type { PageData } from './$types';
+    import ConfigModal from '$lib/components/ConfigModal.svelte';
+    import { useIsFetching } from '@tanstack/svelte-query';
 
     export let data: PageData;
-
     const { user } = data;
-
     const sessionId = '123';
 
     let value: number | undefined;
@@ -25,7 +25,24 @@
             balance: val + ($getQuery.data?.balance ?? 0)
         });
     }
+
+    const modalStore = getModalStore();
+    const modal: ModalSettings = {
+        type: 'component',
+        component: { ref: ConfigModal }
+    };
+
+    // modalStore.trigger(modal);
 </script>
+
+<button
+    on:click={() => modalStore.trigger(modal)}
+    type="button"
+    class="btn-icon absolute right-0 m-3 text-2xl"
+    tabindex="-1"
+>
+    <i class="fa-solid fa-gear" />
+</button>
 
 <form
     on:submit={() => onUpdate(value ?? 0)}
@@ -45,19 +62,8 @@
         />
     </div>
 
-    <button type="submit" class="variant-filled-primary btn">add</button>
+    <div class="flex gap-2">
+        <button type="submit" class="variant-filled-primary btn">add</button>
+        <!--        <button type="submit" class="variant-filled-secondary btn">reset</button>-->
+    </div>
 </form>
-
-<style>
-    /* For Chrome, Safari, Edge, Opera */
-    input[type='number']::-webkit-inner-spin-button,
-    input[type='number']::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-
-    /* For Firefox */
-    input[type='number'] {
-        -moz-appearance: textfield;
-    }
-</style>

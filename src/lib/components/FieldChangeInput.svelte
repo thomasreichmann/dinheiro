@@ -18,11 +18,11 @@
     on:submit={onClick}
 >
     <h1 class="text-gray-200">{title}</h1>
-    <h1 class="w-full bg-surface-700 p-3.5 text-center text-gray-400">{currentValue}</h1>
+    <h1 class="w-full rounded-md bg-surface-700 p-3.5 text-center text-gray-400">{currentValue}</h1>
     <input
-        class="leading-20 input h-14 w-full appearance-none rounded-none px-2 text-center text-2xl"
+        class="leading-20 input h-14 w-full appearance-none rounded-2xl px-2 text-center text-2xl"
         bind:value
         {...$$restProps}
     />
-    <button class="variant-filled-primary btn mt-1">confirm</button>
+    <button class="variant-filled-primary btn mt-1">Confirm</button>
 </form>

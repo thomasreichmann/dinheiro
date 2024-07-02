@@ -1,7 +1,6 @@
 import { error, type RequestHandler } from '@sveltejs/kit';
 import { PrismaClient } from '@prisma/client';
 import type { GetBalanceResponse } from '$lib/types';
-import { debugTimeout } from '$lib/utils';
 
 const prisma = new PrismaClient();
 

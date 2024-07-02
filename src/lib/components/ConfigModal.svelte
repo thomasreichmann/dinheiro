@@ -15,7 +15,7 @@
     };
 </script>
 
-<div class="w-modal flex h-auto justify-evenly bg-surface-700 p-10">
+<div class="w-modal flex h-auto justify-evenly rounded-md bg-surface-700 p-10">
     <FieldChangeInput
         title="Session ID"
         currentValue={sessionId}

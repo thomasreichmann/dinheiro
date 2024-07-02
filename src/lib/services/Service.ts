@@ -1,7 +1,7 @@
 export abstract class Service {
     private readonly _base: string;
 
-    constructor(base: string) {
+    protected constructor(base: string) {
         this._base = base;
     }
 

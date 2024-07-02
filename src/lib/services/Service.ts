@@ -1,4 +1,4 @@
-abstract class Service {
+export abstract class Service {
     private readonly _base: string;
 
     constructor(base: string) {

@@ -1,27 +1,27 @@
 <script lang="ts">
     import { getModalStore, type ModalSettings, ProgressRadial } from '@skeletonlabs/skeleton';
-    import { getBalance, updateBalance } from '$lib/client/balanceClient';
-    import type { PageData } from './$types';
     import ConfigModal from '$lib/components/ConfigModal.svelte';
-
-    export let data: PageData;
-    const { user } = data;
-    const sessionId = '123';
+    import { UserService } from '$lib/services/userService';
 
     let value: number | undefined;
 
-    const updateMutation = updateBalance();
-
-    const getQuery = getBalance(
-        sessionId,
-        user ? { userId: user.sessionId, balance: user.balance } : undefined
-    );
+    const userService = UserService.getInstance() as UserService;
+    let userIdStore = userService.userIdStore;
+    let userStore = userService.userStore;
 
     async function onUpdate(val: number) {
+        // Set the input value to undefined
         value = undefined;
-        $updateMutation.mutate({
-            userId: sessionId,
-            balance: val + ($getQuery.data?.balance ?? 0)
+        userIdStore.subscribe((sessionId) => {
+            userService.updateUser({
+                data: {
+                    sessionId,
+                    balance: val + $userStore.balance
+                },
+                where: {
+                    sessionId
+                }
+            });
         });
     }
 
@@ -47,10 +47,8 @@
     on:submit={() => onUpdate(value ?? 0)}
     class="flex h-screen flex-col items-center justify-center gap-4"
 >
-    {#if $getQuery.isPending}
-        <ProgressRadial value={undefined} />
-    {:else}
-        <h1 class="text-2xl font-bold">{$getQuery.data?.balance}</h1>
+    {#if $userStore}
+        <h1 class="text-2xl font-bold">{$userStore.balance}</h1>
     {/if}
     <div class="flex h-20 w-20 flex-col items-center">
         <input

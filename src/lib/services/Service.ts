@@ -12,8 +12,7 @@ export abstract class Service {
     private static instance: Service;
 
     protected abstract createInstance(): Service;
-
-    static getInstance(): Service {
+    static getInstance() {
         if (!this.instance) {
             this.instance = this.prototype.createInstance();
         }

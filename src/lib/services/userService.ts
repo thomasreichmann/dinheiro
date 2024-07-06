@@ -1,39 +1,55 @@
-import { Service } from '$lib/services/Service';
 import { Prisma } from '@prisma/client';
 import {
+    type CreateMutateFunction,
     type CreateMutationResult,
     createQuery,
     type CreateQueryResult
 } from '@tanstack/svelte-query';
-import { readable, type Writable, writable } from 'svelte/store';
+import { type Readable, readable, type Writable, writable } from 'svelte/store';
 import { createMutationWithOptimisticUpdate } from '$lib/client/baseClient';
+import { Service } from '$lib/services/Service';
+import { browser } from '$app/environment';
+import { error } from '@sveltejs/kit';
 
 export class UserService extends Service {
     private static queryKey: string = 'user';
-    protected createInstance(): Service {
+    protected createInstance() {
         return new UserService();
     }
 
     constructor() {
-        super('/api/user');
+        super('/api/user/');
 
-        let initialId = localStorage.getItem('userId');
-        if (!initialId) {
-            initialId = UserService.generateUserId();
+        console.log(browser);
+
+        if (browser) {
+            let initialId = localStorage.getItem('userId');
+            if (!initialId) {
+                initialId = UserService.generateUserId();
+            }
+
+            this.userIdStore = writable(initialId);
+
+            this.fetchUser(initialId);
+
+            this.userIdStore.subscribe((id) => {
+                localStorage.setItem('userId', id);
+                this.fetchUser(id);
+            });
+
+            this.updateUserMutation = this.createUpdateUserMutation();
+            this.updateUserMutation.subscribe((mutationResult) => {
+                this.mutateUser = mutationResult.mutate;
+            });
+        } else {
+            this.userIdStore = writable('');
         }
-
-        this.userIdStore = writable(initialId);
-        this.userIdStore.subscribe((id) => {
-            localStorage.setItem('userId', id);
-            this.fetchUser(id);
-        });
-
-        this.fetchUser(initialId);
     }
 
-    userIdStore: Writable<string>;
-    userStore: CreateQueryResult<Prisma.UserSelect> = readable();
-    updateUserMutation: CreateUserUpdateMutationResult = this.createUpdateUserMutation();
+    public userIdStore: Writable<string>;
+    userStore: Writable<Prisma.UserGetPayload<Prisma.UserDefaultArgs>> = writable();
+    updateUserMutation!: CreateUserUpdateMutationResult;
+    mutateUser!: CreateBaseUserMutation;
 
     fetchUser(sessionId: string, initialData?: Prisma.UserSelect) {
         const result = createQuery<Prisma.UserSelect>({
@@ -44,15 +60,24 @@ export class UserService extends Service {
             staleTime: 3000
         });
 
-        this.userStore = result;
-
-        return result;
+        return new Promise((resolve, reject) => {
+            result.subscribe((value) => {
+                if (value.isLoading) return;
+                if (value.error) reject(value.error);
+                this.userStore.set(
+                    value.data as unknown as Prisma.UserGetPayload<Prisma.UserDefaultArgs>
+                );
+                resolve(value.data);
+            });
+        });
     }
 
     updateUser(variables: Prisma.UserUpdateArgs) {
-        this.updateUserMutation.subscribe(({ mutate }) => {
-            mutate(variables);
-        });
+        if (this.mutateUser) {
+            this.mutateUser(variables);
+        } else {
+            console.error('Mutate function not initialized');
+        }
     }
 
     private static generateUserId(length: number = 8): string {
@@ -63,9 +88,9 @@ export class UserService extends Service {
 
     private createUpdateUserMutation(): CreateUserUpdateMutationResult {
         const mutationFn = async (rq: Prisma.UserUpdateArgs) => {
-            return await fetch(this.baseURL, {
+            return await fetch(new URL(rq.where.sessionId!, this.baseURL), {
                 method: 'PUT',
-                body: JSON.stringify(rq),
+                body: JSON.stringify(rq.data),
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -78,6 +103,8 @@ export class UserService extends Service {
         );
     }
 }
+
+type CreateBaseUserMutation = CreateMutateFunction<Prisma.UserSelect, Error, Prisma.UserUpdateArgs>;
 
 type CreateUserUpdateMutationResult = CreateMutationResult<
     Prisma.UserSelect,

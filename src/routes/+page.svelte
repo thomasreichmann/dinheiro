@@ -3,12 +3,41 @@
     import ConfigModal from '$lib/components/ConfigModal.svelte';
     import { UserService } from '$lib/services/userService';
     import { slide } from 'svelte/transition';
+    import { browser } from '$app/environment';
 
     let value: number | undefined;
 
     const userService = UserService.getInstance() as UserService;
 
     let { userIdStore, userStore } = userService;
+
+    if (browser) {
+        userStore.subscribe((val) => {
+            if (!val) return;
+            let lastVisited = localStorage.getItem('lastVisited');
+            let now = new Date();
+
+            if (!lastVisited) {
+                // first visit
+                localStorage.setItem('lastVisited', now.toISOString());
+            } else {
+                // Compare the last visited time with the current time
+                // calculate how many days have passed since the last visit rounded down
+                let days = Math.floor(
+                    (now.getTime() - new Date(lastVisited).getTime()) / (1000 * 60 * 60 * 24)
+                );
+
+                // Calculate the balance change based on current balance and daily allowance
+                let balanceChange = days * $userStore.allowance;
+                if (balanceChange > 0) {
+                    onUpdate($userIdStore, balanceChange);
+                }
+            }
+
+            // Update the last visited time
+            localStorage.setItem('lastVisited', now.toISOString());
+        });
+    }
 
     async function onUpdate(sessionId: string, val: number) {
         // Set the input value to undefined

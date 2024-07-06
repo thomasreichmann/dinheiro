@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { getModalStore, type ModalSettings, ProgressRadial } from '@skeletonlabs/skeleton';
+    import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
     import ConfigModal from '$lib/components/ConfigModal.svelte';
     import { UserService } from '$lib/services/userService';
 

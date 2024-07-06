@@ -1,4 +1,4 @@
-import { error, type RequestHandler } from '@sveltejs/kit';
+import { type RequestHandler } from '@sveltejs/kit';
 import { Prisma, PrismaClient } from '@prisma/client';
 import type { GetBalanceResponse } from '$lib/types';
 

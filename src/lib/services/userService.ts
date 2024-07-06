@@ -2,14 +2,12 @@ import { Prisma } from '@prisma/client';
 import {
     type CreateMutateFunction,
     type CreateMutationResult,
-    createQuery,
-    type CreateQueryResult
+    createQuery
 } from '@tanstack/svelte-query';
-import { type Readable, readable, type Writable, writable } from 'svelte/store';
+import { type Writable, writable } from 'svelte/store';
 import { createMutationWithOptimisticUpdate } from '$lib/client/baseClient';
 import { Service } from '$lib/services/Service';
 import { browser } from '$app/environment';
-import { error } from '@sveltejs/kit';
 
 export class UserService extends Service {
     private static queryKey: string = 'user';

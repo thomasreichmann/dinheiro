@@ -2,21 +2,23 @@
     import FieldChangeInput from '$lib/components/FieldChangeInput.svelte';
     import { UserService } from '$lib/services/userService';
 
-    let userService = UserService.getInstance() as UserService;
+    const userService = UserService.getInstance() as UserService;
 
-    let { updateUser, userStore, userIdStore } = userService;
+    let { userIdStore, userStore } = userService;
 
-    const updateSession = (sessionId: string) => {
-        updateUser({
+    const updateSession = (originalSessionId: string, sessionId: string) => {
+        // Change the local store value
+        userService.userIdStore.set(sessionId);
+        userService.updateUser({
             data: {
-                sessionId
+                sessionId: sessionId
             },
-            where: { sessionId }
+            where: { sessionId: originalSessionId }
         });
     };
 
     const updateAllowance = (sessionId: string, allowance: number) => {
-        updateUser({
+        userService.updateUser({
             data: {
                 sessionId,
                 allowance
@@ -32,13 +34,13 @@
     <FieldChangeInput
         title="Session ID"
         currentValue={$userIdStore}
-        on:click={(e) => updateSession(e.detail)}
+        on:click={(e) => updateSession($userIdStore, e.detail)}
         type="number"
     />
     <FieldChangeInput
         title="Daily allowance"
         currentValue={$userStore.allowance.toString()}
-        on:click={(e) => updateAllowance($userStore.sessionId, e.detail)}
+        on:click={(e) => updateAllowance($userStore.sessionId, parseInt(e.detail))}
         type="number"
     />
 </div>

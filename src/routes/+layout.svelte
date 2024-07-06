@@ -22,8 +22,8 @@
     }
 </script>
 
-<Modal />
 <QueryClientProvider client={queryClient}>
+    <Modal />
     <slot />
     <div id="global-fetching-indicator-wrapper" class:visible={$showIndicator}>
         <ProgressBar meter="bg-secondary-500" />

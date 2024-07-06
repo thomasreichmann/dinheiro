@@ -25,13 +25,13 @@ export class UserService extends Service {
             initialId = UserService.generateUserId();
         }
 
+        this.userId = initialId;
         this.userIdStore = writable(initialId);
 
-        this.fetchUser(initialId);
+        this.fetchUser();
 
         this.userIdStore.subscribe((id) => {
             localStorage.setItem('userId', id);
-            this.fetchUser(id);
         });
 
         this.updateUserMutation = this.createUpdateUserMutation();
@@ -40,18 +40,18 @@ export class UserService extends Service {
         });
     }
 
+    private userId!: string;
     public userIdStore: Writable<string> = writable();
     public userStore: Writable<Prisma.UserGetPayload<Prisma.UserDefaultArgs>> = writable();
     public updateUserMutation!: CreateUserUpdateMutationResult;
     public mutateUser!: CreateBaseUserMutation;
 
-    fetchUser(sessionId: string, initialData?: Prisma.UserSelect) {
+    fetchUser(initialData?: Prisma.UserSelect) {
         const result = createQuery<Prisma.UserSelect>({
             queryKey: [UserService.queryKey],
             queryFn: async () =>
-                await fetch(new URL(sessionId, this.baseURL)).then((r) => r.json()),
-            initialData: initialData as undefined,
-            staleTime: 3000
+                await fetch(new URL(this.userId, this.baseURL)).then((r) => r.json()),
+            initialData: initialData as undefined
         });
 
         return new Promise((resolve, reject) => {
@@ -66,8 +66,9 @@ export class UserService extends Service {
         });
     }
 
-    updateUser(variables: Prisma.UserUpdateArgs) {
+    async updateUser(variables: Prisma.UserUpdateArgs) {
         if (this.mutateUser) {
+            this.userId = variables.data.sessionId as string;
             this.mutateUser(variables);
         } else {
             console.error('Mutate function not initialized');

@@ -2,8 +2,7 @@
     import { getModalStore, type ModalSettings, ProgressRadial } from '@skeletonlabs/skeleton';
     import ConfigModal from '$lib/components/ConfigModal.svelte';
     import { UserService } from '$lib/services/userService';
-    import { fade, fly, slide } from 'svelte/transition';
-    import { quintOut } from 'svelte/easing';
+    import { slide } from 'svelte/transition';
 
     let value: number | undefined;
 
@@ -15,7 +14,7 @@
         // Set the input value to undefined
         value = undefined;
 
-        userService.updateUser({
+        await userService.updateUser({
             data: {
                 sessionId,
                 balance: val + $userStore.balance
@@ -45,7 +44,7 @@
 </button>
 
 <form
-    on:submit={() => onUpdate($userStore.sessionId, value ?? 0)}
+    on:submit={() => onUpdate($userIdStore, value ?? 0)}
     class="flex h-screen flex-col items-center justify-center gap-4"
 >
     {#if $userStore}

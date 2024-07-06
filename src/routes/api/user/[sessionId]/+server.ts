@@ -1,14 +1,10 @@
 import { type RequestHandler } from '@sveltejs/kit';
 import { Prisma, PrismaClient } from '@prisma/client';
-import type { GetBalanceResponse } from '$lib/types';
-import { debugTimeout } from '$lib/utils';
 
 const prisma = new PrismaClient();
 
 export const GET: RequestHandler = async ({ params }): Promise<Response> => {
     const { sessionId } = params;
-
-    await debugTimeout(2000);
 
     if (!sessionId) return new Response('Missing session id', { status: 400 });
 
@@ -22,24 +18,39 @@ export const GET: RequestHandler = async ({ params }): Promise<Response> => {
         user = await prisma.user.create({ data: { sessionId } });
     }
 
-    const response: GetBalanceResponse = {
-        userId: user.sessionId,
-        balance: user.balance
-    };
-
-    return new Response(JSON.stringify(response));
+    return new Response(JSON.stringify(user));
 };
 
-export const PUT: RequestHandler = async ({ request }): Promise<Response> => {
-    const user = (await request.json()) as Prisma.UserUpdateInput;
-    if (!user.sessionId) return new Response('Missing session id', { status: 400 });
+export const PUT: RequestHandler = async ({ request, params }): Promise<Response> => {
+    const { sessionId } = params;
+    let user = (await request.json()) as Prisma.UserUpdateInput;
+    if (!user.sessionId || !sessionId)
+        return new Response('Missing sessionasd id', { status: 400 });
 
-    await prisma.user.update({
-        where: {
-            sessionId: user.sessionId as string
-        },
-        data: user
-    });
+    if (user.sessionId == sessionId) {
+        user = await prisma.user.update({
+            where: {
+                sessionId: user.sessionId as string
+            },
+            data: user
+        });
+    } else {
+        const foundUser = await prisma.user.findUnique({
+            where: {
+                sessionId: user.sessionId as string
+            }
+        });
+
+        if (!foundUser) {
+            user = await prisma.user.create({
+                data: {
+                    sessionId: user.sessionId as string
+                }
+            });
+        } else {
+            user = foundUser;
+        }
+    }
 
     return new Response(JSON.stringify(user));
 };

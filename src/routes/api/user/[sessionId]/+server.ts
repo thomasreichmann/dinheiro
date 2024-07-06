@@ -1,11 +1,14 @@
 import { type RequestHandler } from '@sveltejs/kit';
 import { Prisma, PrismaClient } from '@prisma/client';
 import type { GetBalanceResponse } from '$lib/types';
+import { debugTimeout } from '$lib/utils';
 
 const prisma = new PrismaClient();
 
 export const GET: RequestHandler = async ({ params }): Promise<Response> => {
     const { sessionId } = params;
+
+    await debugTimeout(2000);
 
     if (!sessionId) return new Response('Missing session id', { status: 400 });
 

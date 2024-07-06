@@ -1,31 +1,44 @@
 <script lang="ts">
     import FieldChangeInput from '$lib/components/FieldChangeInput.svelte';
+    import { UserService } from '$lib/services/userService';
 
-    let currentAllowance = 110;
-    let sessionId = '12345678';
+    let userService = UserService.getInstance() as UserService;
 
-    const updateSession = (id: string) => {
-        // does update session stuff
-        console.log(`Session ID updated to ${id}`);
+    let { updateUser, userStore, userIdStore } = userService;
+
+    const updateSession = (sessionId: string) => {
+        updateUser({
+            data: {
+                sessionId
+            },
+            where: { sessionId }
+        });
     };
 
-    const updateAllowance = (allowance: number) => {
-        // does update session stuff
-        console.log(`Daily allowance updated to ${allowance}`);
+    const updateAllowance = (sessionId: string, allowance: number) => {
+        updateUser({
+            data: {
+                sessionId,
+                allowance
+            },
+            where: {
+                sessionId
+            }
+        });
     };
 </script>
 
 <div class="w-modal flex h-auto justify-evenly rounded-md bg-surface-700 p-10">
     <FieldChangeInput
         title="Session ID"
-        currentValue={sessionId}
+        currentValue={$userIdStore}
         on:click={(e) => updateSession(e.detail)}
         type="number"
     />
     <FieldChangeInput
         title="Daily allowance"
-        currentValue={currentAllowance.toString()}
-        on:click={(e) => updateAllowance(e.detail)}
+        currentValue={$userStore.allowance.toString()}
+        on:click={(e) => updateAllowance($userStore.sessionId, e.detail)}
         type="number"
     />
 </div>

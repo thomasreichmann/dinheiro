@@ -1,13 +1,15 @@
 <script lang="ts">
-    import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+    import { getModalStore, type ModalSettings, ProgressRadial } from '@skeletonlabs/skeleton';
     import ConfigModal from '$lib/components/ConfigModal.svelte';
     import { UserService } from '$lib/services/userService';
+    import { fade, fly, slide } from 'svelte/transition';
+    import { quintOut } from 'svelte/easing';
 
     let value: number | undefined;
 
     const userService = UserService.getInstance() as UserService;
-    let userIdStore = userService.userIdStore;
-    let userStore = userService.userStore;
+
+    let { userIdStore, userStore } = userService;
 
     async function onUpdate(val: number) {
         // Set the input value to undefined
@@ -48,8 +50,15 @@
     class="flex h-screen flex-col items-center justify-center gap-4"
 >
     {#if $userStore}
-        <h1 class="text-2xl font-bold">{$userStore.balance}</h1>
+        <h1 transition:slide={{ duration: 600 }} class="text-2xl font-bold">
+            {$userStore.balance}
+        </h1>
+    {:else}
+        <div transition:slide={{ duration: 150 }}>
+            <ProgressRadial class="flex h-20 w-20 flex-col items-center" />
+        </div>
     {/if}
+
     <div class="flex h-20 w-20 flex-col items-center">
         <input
             type="number"

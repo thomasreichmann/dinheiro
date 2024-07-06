@@ -18,36 +18,32 @@ export class UserService extends Service {
     constructor() {
         super('/api/user/');
 
-        console.log(browser);
+        if (!browser) return;
 
-        if (browser) {
-            let initialId = localStorage.getItem('userId');
-            if (!initialId) {
-                initialId = UserService.generateUserId();
-            }
-
-            this.userIdStore = writable(initialId);
-
-            this.fetchUser(initialId);
-
-            this.userIdStore.subscribe((id) => {
-                localStorage.setItem('userId', id);
-                this.fetchUser(id);
-            });
-
-            this.updateUserMutation = this.createUpdateUserMutation();
-            this.updateUserMutation.subscribe((mutationResult) => {
-                this.mutateUser = mutationResult.mutate;
-            });
-        } else {
-            this.userIdStore = writable('');
+        let initialId = localStorage.getItem('userId');
+        if (!initialId) {
+            initialId = UserService.generateUserId();
         }
+
+        this.userIdStore = writable(initialId);
+
+        this.fetchUser(initialId);
+
+        this.userIdStore.subscribe((id) => {
+            localStorage.setItem('userId', id);
+            this.fetchUser(id);
+        });
+
+        this.updateUserMutation = this.createUpdateUserMutation();
+        this.updateUserMutation.subscribe((mutationResult) => {
+            this.mutateUser = mutationResult.mutate;
+        });
     }
 
-    public userIdStore: Writable<string>;
-    userStore: Writable<Prisma.UserGetPayload<Prisma.UserDefaultArgs>> = writable();
-    updateUserMutation!: CreateUserUpdateMutationResult;
-    mutateUser!: CreateBaseUserMutation;
+    public userIdStore: Writable<string> = writable();
+    public userStore: Writable<Prisma.UserGetPayload<Prisma.UserDefaultArgs>> = writable();
+    public updateUserMutation!: CreateUserUpdateMutationResult;
+    public mutateUser!: CreateBaseUserMutation;
 
     fetchUser(sessionId: string, initialData?: Prisma.UserSelect) {
         const result = createQuery<Prisma.UserSelect>({

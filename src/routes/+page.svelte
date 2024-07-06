@@ -11,19 +11,18 @@
 
     let { userIdStore, userStore } = userService;
 
-    async function onUpdate(val: number) {
+    async function onUpdate(sessionId: string, val: number) {
         // Set the input value to undefined
         value = undefined;
-        userIdStore.subscribe((sessionId) => {
-            userService.updateUser({
-                data: {
-                    sessionId,
-                    balance: val + $userStore.balance
-                },
-                where: {
-                    sessionId
-                }
-            });
+
+        userService.updateUser({
+            data: {
+                sessionId,
+                balance: val + $userStore.balance
+            },
+            where: {
+                sessionId
+            }
         });
     }
 
@@ -46,7 +45,7 @@
 </button>
 
 <form
-    on:submit={() => onUpdate(value ?? 0)}
+    on:submit={() => onUpdate($userStore.sessionId, value ?? 0)}
     class="flex h-screen flex-col items-center justify-center gap-4"
 >
     {#if $userStore}

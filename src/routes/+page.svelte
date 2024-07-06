@@ -95,8 +95,15 @@
         />
     </div>
 
-    <div class="flex gap-2">
+    <div class="flex flex-col gap-2">
         <button type="submit" class="variant-filled-primary btn">add</button>
-        <!--        <button type="submit" class="variant-filled-secondary btn">reset</button>-->
+        <button
+            type="button"
+            class="variant-filled-secondary btn"
+            on:click={() => {
+                // Add or remove a negative sign to the input value
+                value = value ? -value : value;
+            }}>invert</button
+        >
     </div>
 </form>

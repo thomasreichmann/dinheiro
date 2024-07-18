@@ -46,7 +46,7 @@
         await userService.updateUser({
             data: {
                 sessionId,
-                balance: val + $userStore.balance
+                balance: -val + $userStore.balance
             },
             where: {
                 sessionId
@@ -96,7 +96,7 @@
     </div>
 
     <div class="flex flex-col gap-2">
-        <button type="submit" class="variant-filled-primary btn">add</button>
+        <button type="submit" class="variant-filled-primary btn">submit</button>
         <button
             type="button"
             class="variant-filled-secondary btn"
